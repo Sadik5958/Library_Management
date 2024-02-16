@@ -4,10 +4,29 @@ const client = new Client({
   connectionString: "",
 });
 
+async function connect() {
+  try {
+    await client.connect();
+    console.log("Connected to database");
+  } catch (err) {
+    console.error("Error connecting to database: ", err);
+    throw err;
+  }
+}
+
+async function disconnect() {
+  try {
+    await client.end();
+    console.log("Disconnected from database");
+  } catch (err) {
+    console.error("Error disconnecting from database: ", err);
+    throw err;
+  }
+}
+
 async function User() {
-  await client.connect();
   const result = await client.query(`
-    CREATE TABLE user (
+    CREATE TABLE IF NOT EXISTS user (
       id SERIAL PRIMARY KEY,
       USERNAME VARCHAR(50) NOT NULL,
       email VARCHAR(64) UNIQUE NOT NULL,
@@ -18,9 +37,8 @@ async function User() {
 }
 
 async function Librarian() {
-  await client.connect();
   const result = await client.query(`
-    CREATE TABLE librarian (
+    CREATE TABLE IF NOT EXISTS librarian (
       id SERIAL PRIMARY KEY,
       email VARCHAR(255) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
@@ -30,9 +48,8 @@ async function Librarian() {
 }
 
 async function LibrarianBook() {
-  await client.connect();
   const result = await client.query(`
-    CREATE TABLE librarian_books (
+    CREATE TABLE IF NOT EXISTS librarian_books (
       book_id SERIAL PRIMARY KEY,
       book_title VARCHAR(255) UNIQUE NOT NULL,
       content VARCHAR(255) UNIQUE NOT NULL,
@@ -43,9 +60,8 @@ async function LibrarianBook() {
 }
 
 async function UserBook() {
-  await client.connect();
   const result = await client.query(`
-    CREATE TABLE user_books (
+    CREATE TABLE IF NOT EXISTS user_books (
       book_id SERIAL PRIMARY KEY,
       book_title VARCHAR(255) UNIQUE NOT NULL,
       content VARCHAR(255) UNIQUE NOT NULL,
@@ -55,3 +71,5 @@ async function UserBook() {
     );
 `);
 }
+
+export { connect, disconnect, User, Librarian, LibrarianBook, UserBook };
